@@ -147,7 +147,57 @@ syn(对象){
         Fork/Join的同步用法同时演示返回结果值：统计整形数组中所有元素的和
         Fork/Join的异步用法同时演示不要求返回值：遍历指定目录(含子目录)，寻找指定类型的文件
         
-### CountDownLatch的作用、应用场景和实战
+#### CountDownLatch的作用、应用场景和实战
 
     await的线程可以是多个
     countDown可以在同一个线程中扣减多次
+    
+    await的扣减只能扣减一次
+    
+#### CyclicBarrier的作用、应用场景和实战
+
+    初始化的数量必须和等待数量相同
+    
+    await方法可以多次使用，配合action可以看到多次执行action
+    
+#### Semaphore的作用、应用场景和实战
+
+    对公共资源有限的场景做流量控制，和被争夺的资源本身没有任何关系
+    Semaphore注意事项：
+        如果没有事先调用acquire就直接调用release的话，会一直增加数量
+        
+#### Exchange的作用、应用场景和实战
+
+    两个线程之间进行数据交换，JDK保证交换的过程是线程安全的
+    
+#### Callable、Future、FutureTask
+
+    FutureTask既可以当作Runnable投给线程执行，也可以拿到结果
+    可以中断
+    
+### 第三课：原子操作 CAS
+
+#### CAS(Compare And Swap)
+    
+    什么是原子操作？如何实现原子操作？
+    属于乐观锁
+    
+CAS的原理
+
+- 利用了现代处理器都支持的CAS指令
+- 循环这个指令，直到成功为止
+
+CAS的问题
+
+- ABA问题
+- 开销问题
+- 只能保证一个共享变量的原子操作
+
+原子操作类的使用
+
+JDK中相关原子操作类的使用
+
+    更新基本类型类：AtomicBoolean、AtomicInteger、AtomicLong
+    更新数组类：AtomicIntegerArray、AtomicLongArray、AtomicReferenceArray
+    更新引用类型：AtomicReference、AtomicMarkableReference、AtomicStampedReference
+    原子更新字段类：……………………
