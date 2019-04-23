@@ -1,11 +1,12 @@
 package com.enjoy.study.ch002.home_work_20190421;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 
 /**
- * <b>Author</b>: Hsiang Leekwok<br/>
+ * <b>Author</b>: 小果<br/>
  * <b>Date</b>: 2019/04/21 21:04<br/>
  * <b>Version</b>: v1.0<br/>
  * <b>Subject</b>: 利用 Fork/Join 方式实现归并排序
@@ -13,37 +14,22 @@ import java.util.concurrent.RecursiveTask;
  */
 public class UseForkJoinToImplementMergeSort {
 
-    private static final int SIZE = 10;
-    private static final int THRESHOLD = SIZE / 5;
+    private static final int SIZE = 1000000;
+    private static final int THRESHOLD = 10;
 
-    private static class MergeTask extends RecursiveTask<Long> {
+    private static class MergeTask extends RecursiveTask<int[]> {
 
         private int[] source;
-        private int start, end;
+        private boolean useQuick;
 
-        public MergeTask(int[] array, int startIndex, int endIndex) {
+        MergeTask(int[] array, boolean quick) {
             this.source = array;
-            this.start = startIndex;
-            this.end = endIndex;
+            this.useQuick = quick;
         }
 
-        /**
-         * 达到最小任务需求时，使用冒泡排序法进行由小到大排序
-         */
-        private void bubbleSort() {
-            int temp;
-            for (int i = start; i <= end; i++) {
-                for (int j = start; j <= end; j++) {
-                    if (source[j] > source[j + 1]) {
-                        temp = source[j + 1];
-                        source[j + 1] = source[j];
-                        source[j] = temp;
-                    }
-                }
-            }
-        }
-
+        // 快速排序
         private void quickSort() {
+            int start = 0, end = source.length - 1;
             quickSort(start, end);
         }
 
@@ -72,37 +58,85 @@ public class UseForkJoinToImplementMergeSort {
             quickSort(low + 1, right);
         }
 
+        // 插入排序：借用老师的
+        public static int[] sort(int[] array) {
+            if (array.length == 0)
+                return array;
+            int currentValue;/*当前待排序数据，该元素之前的元素均已被排序过*/
+            for (int i = 0; i < array.length - 1; i++) {
+                int preIndex = i;/*已被排序数据的索引*/
+                currentValue = array[preIndex + 1];
+
+            /*在已被排序过数据中倒序寻找合适的位置，如果当前待排序数据比比较的元素要小，
+            将比较的元素元素后移一位*/
+                while (preIndex >= 0 && currentValue < array[preIndex]) {
+                    //将当前元素后移一位
+                    array[preIndex + 1] = array[preIndex];
+                    preIndex--;
+                }
+                /*while循环结束时，说明已经找到了当前待排序数据的合适位置，插入*/
+                array[preIndex + 1] = currentValue;
+            }
+            return array;
+        }
+
+        // 合并：借用老师的方法
+        private int[] merge(int[] left, int[] right) {
+            int[] result = new int[left.length + right.length];
+            for (int index = 0, i = 0, j = 0; index < result.length; index++) {
+                if (i >= left.length)/*左边数组已经取完，完全取右边数组的值即可*/
+                    result[index] = right[j++];
+                else if (j >= right.length)/*右边数组已经取完，完全取左边数组的值即可*/
+                    result[index] = left[i++];
+                else if (left[i] > right[j])/*左边数组的元素值大于右边数组，取右边数组的值*/
+                    result[index] = right[j++];
+                else/*右边数组的元素值大于左边数组，取左边数组的值*/
+                    result[index] = left[i++];
+            }
+
+            return result;
+        }
+
         @Override
-        protected Long compute() {
-            int len = end - start;
-            if (len < THRESHOLD) {
-                quickSort();
-                return 0L;
+        protected int[] compute() {
+            if (source.length <= THRESHOLD) {
+                if (useQuick) {
+                    quickSort();
+                    return source;
+                } else {
+                    return sort(source);
+                }
             } else {
-                int mid = len / 2;
-                MergeTask left = new MergeTask(source, start, mid);
-                MergeTask right = new MergeTask(source, mid + 1, end);
-                invokeAll(left, right);
-                return left.join() + right.join();
+                int mid = source.length / 2;
+                MergeTask leftTask = new MergeTask(Arrays.copyOfRange(source, 0, mid), useQuick);
+                MergeTask rightTask = new MergeTask(Arrays.copyOfRange(source, mid + 1, source.length), useQuick);
+                invokeAll(leftTask, rightTask);
+                int[] left = leftTask.join();
+                int[] right = rightTask.join();
+                return merge(left, right);
             }
         }
     }
 
 
     public static void main(String[] args) {
-        long start = System.currentTimeMillis();
         int[] array = new int[SIZE];
         Random random = new Random();
         for (int i = 0; i < array.length; i++) {
-            array[i] = random.nextInt(SIZE);
+            array[i] = random.nextInt(100);
         }
-        start = System.currentTimeMillis();
+        long start = System.currentTimeMillis();
+        System.out.println("array length: " + SIZE);
 
         ForkJoinPool pool = new ForkJoinPool();
-        MergeTask task = new MergeTask(array, 0, SIZE - 1);
+        MergeTask task = new MergeTask(array, true);
         pool.invoke(task);
-        System.out.println("task running.......");
-        task.join();
-        System.out.println("time used: " + (System.currentTimeMillis() - start) + "ms");
+        System.out.println("quick sort used time: " + (System.currentTimeMillis() - start) + "ms");
+        task = new MergeTask(array, false);
+        pool.invoke(task);
+        System.out.println("insertion sort used time: " + (System.currentTimeMillis() - start) + "ms");
+        //System.out.println("task running.......");
+        //int[] ret = task.join();
+        //System.out.println(Arrays.toString(ret));
     }
 }

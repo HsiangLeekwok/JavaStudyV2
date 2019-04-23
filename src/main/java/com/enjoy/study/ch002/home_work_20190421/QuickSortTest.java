@@ -12,7 +12,7 @@ import java.util.Random;
  */
 public class QuickSortTest {
 
-    private static final int SIZE = 1000000;
+    private static final int SIZE = 10000000;
     private static int[] source;
 
     private static void quickSort(int left, int right) {
@@ -46,6 +46,34 @@ public class QuickSortTest {
         quickSort(low + 1, right);
     }
 
+    static void sort(int arr[], int low, int high) {
+        int l = low;
+        int h = high;
+        int povit = arr[low];
+
+        while (l < h) {
+            while (l < h && arr[h] >= povit)
+                h--;
+            if (l < h) {
+                arr[l] = arr[h];
+                l++;
+            }
+
+            while (l < h && arr[l] <= povit)
+                l++;
+
+            if (l < h) {
+                arr[h] = arr[l];
+                h--;
+            }
+        }
+        arr[l] = povit;
+        //print(arr);
+        //System.out.print("l=" + (l + 1) + "h=" + (h + 1) + "povit=" + povit + "\n");
+        if (l - 1 > low) sort(arr, low, l - 1);
+        if (h + 1 < high) sort(arr, h + 1, high);
+    }
+
     public static void main(String[] args) {
         long start = System.currentTimeMillis();
         source = new int[SIZE];
@@ -57,6 +85,7 @@ public class QuickSortTest {
         System.out.println("init used: " + (System.currentTimeMillis() - start) + "ms");
         start = System.currentTimeMillis();
         quickSort(0, SIZE - 1);
+        //sort(source, 0, SIZE - 1);
         //System.out.println("source: " + Arrays.toString(source));
         System.out.println("sort used: " + (System.currentTimeMillis() - start) + "ms");
     }
