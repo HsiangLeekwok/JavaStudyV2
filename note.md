@@ -201,3 +201,70 @@ JDK中相关原子操作类的使用
     更新数组类：AtomicIntegerArray、AtomicLongArray、AtomicReferenceArray
     更新引用类型：AtomicReference、AtomicMarkableReference、AtomicStampedReference
     原子更新字段类：……………………
+    
+#### 显式锁和AQS
+
+显式锁
+    
+    申明一个锁，手动去释放、加锁的，叫显式锁
+    Lock接口和和新方法
+        lock()
+        unlock()
+        tryLock()
+        
+    Lock接口和synchronized的比较
+        synchronized的消耗比显式锁少
+        
+    可重入锁ReentrantLock、公平锁和非公平锁
+    
+    Lock接口的使用范式
+    
+    可重入锁
+    
+    ReadWriteLock接口和读写锁ReentrantReadWriteLock，什么情况下用读写锁？
+    
+    Condition接口
+    
+    用Lock和Condition实现等待通知
+    
+    了解LockSupport工具
+    作用：
+        阻塞一个线程
+        唤醒一个线程
+        构建同步组件的基础工具
+    park开头的方法：阻塞一个线程
+    unpart开头的方法：唤醒一个线程
+    
+AQS(AbstractQueuedSynchronizer)
+
+    CLH 队列锁
+    什么是AQS？学习它的必要性
+        AQS 使用方式和其中的设计模式
+        了解其中的方法
+        实现一个类似于 ReentrantLock 的锁
+        
+    AQS 中的数据结构 - 节点和同步队列
+    
+    都展示同步状态获取与释放
+    
+    其他同步状态获取与释放
+        共享是同步状态获取与释放
+        都展示超时同步状态 获取
+        
+    再次实战：实现一个奇葩的三元共享同步工具类
+    
+Condition 分析
+
+    一个Condition包含一个等待队列
+    
+    区分同步队列与等待队列
+    
+    既然是3个线程共享，为什么在加锁或者释放锁的时候getState所在的for循环里没有做同步？
+    
+回头看Lock的实现
+    
+    了解 ReentrantLock 的实现
+        锁的可重入
+        公平和非公平
+        
+    将类似
