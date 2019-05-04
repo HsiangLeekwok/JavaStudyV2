@@ -48,7 +48,8 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
         }
 
         public void runSafety() {
-            if (compareAndSetState(NEW, COMPLETING)) {
+            // 从 New 转换到 Completing 状态
+            if (tryAcquire(COMPLETING)) {
                 state = COMPLETING;
                 try {
                     try {
@@ -60,6 +61,8 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
                     }
                 } finally {
                     state = COMPLETED;
+                    // 状态改为 Completed
+                    tryRelease(COMPLETING);
                 }
             }
         }
@@ -68,7 +71,9 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
             if (state == COMPLETED) {
                 return (V) result;
             }
-            return null;
+            // 等待计算结果
+            acquire(COMPLETED);
+            return (V) result;
         }
     }
 
@@ -136,8 +141,7 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
         if (isDone())
             return (V) result;
         // 如果没有计算完毕，则等待计算结果
-        sync.acquire(COMPLETED);
-        return (V) result;
+        return sync.getSafety();
     }
 
     @SuppressWarnings("unchecked")

@@ -35,17 +35,18 @@ public class TestMyTask {
         HomeWork20190430_CAS_FutureTask<Integer> task = new HomeWork20190430_CAS_FutureTask<>(new TaskCallable());
         Thread thread = new Thread(task);
         long start = System.currentTimeMillis();
-        //thread.start();
+        thread.start();
         new Thread(() -> {
             try {
-                int res = task.get(4000, TimeUnit.MILLISECONDS);
+                int res = task.get();
                 System.out.println("result(in thread): " + res + ", used time: " + (System.currentTimeMillis() - start) + "ms");
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }).start();
-        //int result = task.get();
-        //System.out.println("result: " + result + ", time used: " + (System.currentTimeMillis() - start) + "ms");
-        Thread.sleep(5000);
+        int result = task.get();
+        System.out.println("result: " + result + ", time used: " + (System.currentTimeMillis() - start) + "ms");
+        //Thread.sleep(5000);
+        Thread.currentThread().join();
     }
 }
