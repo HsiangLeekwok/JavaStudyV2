@@ -63,8 +63,12 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
                 }
             }
         }
-        public V getSafety(){
-            if(compareAndSetState())
+
+        public V getSafety() {
+            if (state == COMPLETED) {
+                return (V) result;
+            }
+            return null;
         }
     }
 
@@ -107,26 +111,6 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
 
         if (state == NEW) {
             sync.runSafety();
-            try {
-                // 更改执行状态为 COMPLETING
-                state = COMPLETING;
-
-                try {
-                    // 执行方法并获得结果
-                    result = callable.call();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    state = EXCEPTION;
-                    // 异常时返回结果置为 null
-                    result = null;
-                }
-            } finally {
-                // 执行完毕之后将状态置为 COMPLETED
-                state = COMPLETED;
-                synchronized (this) {
-                    this.notifyAll();
-                }
-            }
         }
     }
 
@@ -152,9 +136,7 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
         if (isDone())
             return (V) result;
         // 如果没有计算完毕，则等待计算结果
-        synchronized (this) {
-            this.wait();
-        }
+        sync.acquire(COMPLETED);
         return (V) result;
     }
 

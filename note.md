@@ -153,12 +153,20 @@ syn(对象){
     countDown可以在同一个线程中扣减多次
     
     await的扣减只能扣减一次
+    由外部线程来协调线程的同步
     
 #### CyclicBarrier的作用、应用场景和实战
 
     初始化的数量必须和等待数量相同
     
     await方法可以多次使用，配合action可以看到多次执行action
+    由线程本身自己来协调同步
+    
+    CountDownLatch 和 CyclicBarrier 的区别：
+    1、CyclicBarrier 的计数器可以反复使用，在某个屏障上反复协调使用。
+    2、在协调线程之间同时运行的区别：CountDownLatch 是由外部线程来做，CyclicBarrier 由线程本身自己来协调
+    3、CountDownLatch 的计数器跟线程数没有关系，CyclicBarrier 则跟线程数密切相关的
+    4、CountDownLatch 不能汇总线程之间的计算结果，但 CyclicBarrier 可以在传入action之后进行线程之间结果的汇总。
     
 #### Semaphore的作用、应用场景和实战
 
@@ -172,7 +180,7 @@ syn(对象){
     
 #### Callable、Future、FutureTask
 
-    FutureTask既可以当作Runnable投给线程执行，也可以拿到结果
+    FutureTask 既可以当作 Runnable 投给线程执行，也可以拿到结果
     可以中断
     
 ### 第三课：原子操作 CAS
@@ -202,7 +210,7 @@ JDK中相关原子操作类的使用
     更新引用类型：AtomicReference、AtomicMarkableReference、AtomicStampedReference
     原子更新字段类：……………………
     
-#### 显式锁和AQS
+### 第四课：显式锁和AQS
 
 显式锁
     
