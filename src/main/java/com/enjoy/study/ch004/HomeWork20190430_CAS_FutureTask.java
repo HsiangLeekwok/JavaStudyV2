@@ -25,12 +25,9 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
 
         @Override
         protected boolean tryAcquire(int arg) {
-            int s = getState();
-            if (s == 0) {
-                if (compareAndSetState(0, arg)) {
-                    setExclusiveOwnerThread(Thread.currentThread());
-                    return true;
-                }
+            if (compareAndSetState(COMPLETED, GETTING)) {
+                setExclusiveOwnerThread(Thread.currentThread());
+                return true;
             }
             return false;
         }
@@ -39,7 +36,7 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
         protected boolean tryRelease(int arg) {
             if (isHeldExclusively()) {
                 // 释放锁
-                if (compareAndSetState(1, arg)) {
+                if (compareAndSetState(GETTING, COMPLETED)) {
                     setExclusiveOwnerThread(null);
                     return true;
                 }
@@ -47,9 +44,9 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
             return false;
         }
 
-        public void runSafety() {
+        void runSafety() {
             // 从 New 转换到 Completing 状态
-            if (tryAcquire(COMPLETING)) {
+            if (compareAndSetState(NEW, COMPLETING)) {
                 state = COMPLETING;
                 try {
                     try {
@@ -62,17 +59,26 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
                 } finally {
                     state = COMPLETED;
                     // 状态改为 Completed
-                    tryRelease(COMPLETING);
+                    compareAndSetState(COMPLETING, COMPLETED);
+                    synchronized (HomeWork20190430_CAS_FutureTask.this) {
+                        HomeWork20190430_CAS_FutureTask.this.notifyAll();
+                    }
                 }
             }
         }
 
-        public V getSafety() {
+        V getSafety() {
             if (state == COMPLETED) {
                 return (V) result;
             }
             // 等待计算结果
-            acquire(COMPLETED);
+            synchronized (HomeWork20190430_CAS_FutureTask.this) {
+                try {
+                    HomeWork20190430_CAS_FutureTask.this.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             return (V) result;
         }
     }
@@ -85,6 +91,8 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
     private static final int COMPLETED = 2;
     // 执行过程中发生异常
     private static final int EXCEPTION = 3;
+    // get结果
+    private static final int GETTING = 4;
 
     // FutureTask 的执行状态
     private volatile int state;
@@ -157,18 +165,17 @@ public class HomeWork20190430_CAS_FutureTask<V> implements RunnableFuture<V> {
             if (isDone()) {
                 return (V) result;
             }
-            //
-            if (sync.tryAcquireNanos(1, unit.toNanos(10))) {
-                try {
-                    if (timeout > 0) {
-                        interval = deadline - System.currentTimeMillis();
-                        if (interval <= 0 && !isDone()) {
-                            // 等待超时了
-                            throw new TimeoutException();
-                        }
+            // 等待10ms之后查看结果
+            if (!sync.tryAcquire(1)) {
+                if (timeout > 0) {
+                    interval = deadline - System.currentTimeMillis();
+                    if (interval <= 0 && !isDone()) {
+                        // 等待超时了
+                        throw new TimeoutException();
                     }
-                } finally {
-                    sync.release(0);
+                }
+                synchronized (this) {
+                    wait(10);
                 }
             }
         }

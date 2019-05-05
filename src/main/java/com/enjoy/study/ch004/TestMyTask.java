@@ -31,22 +31,21 @@ public class TestMyTask {
     }
 
     @Test
-    public void text() throws ExecutionException, InterruptedException {
+    public void test() throws ExecutionException, InterruptedException {
         HomeWork20190430_CAS_FutureTask<Integer> task = new HomeWork20190430_CAS_FutureTask<>(new TaskCallable());
         Thread thread = new Thread(task);
         long start = System.currentTimeMillis();
         thread.start();
         new Thread(() -> {
             try {
-                int res = task.get();
+                int res = task.get(2000, TimeUnit.MILLISECONDS);
                 System.out.println("result(in thread): " + res + ", used time: " + (System.currentTimeMillis() - start) + "ms");
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 e.printStackTrace();
             }
         }).start();
         int result = task.get();
         System.out.println("result: " + result + ", time used: " + (System.currentTimeMillis() - start) + "ms");
-        //Thread.sleep(5000);
-        Thread.currentThread().join();
+        //Thread.sleep(3000);
     }
 }
