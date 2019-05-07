@@ -282,7 +282,7 @@ CAS的问题
 
 #### 预备知识 - Hash
 
-    Hsah，一般翻译做“散列”，也有直接音译为“哈希”的，就是把任意长度的输入（又叫做预映射）
+    Hsah，一般翻译做“散列”，也有直接音译为“哈希”的，就是把任意长度的输入（又叫做预映射）通过散列算法变换成固定长度的输出，该输出就是散列值。这种转换是一种压缩映射，也就是，散列值的空间通常元小雨输入的控件，不同的输入可能会
     简单的说就是一种将任意长度的消息压缩到某一固定长度的消息摘要的函数。
     
     常用的hash函数：直接取余法、乘法取整法、平方取中法
@@ -323,4 +323,79 @@ CAS的问题
     
      如何快速的判定一个数是奇数还是偶数？
  
- 1.7种的HashMap的死循环，会形成一个环形的数据结构
+ #### 1.7种的HashMap的死循环，会形成一个环形的数据结构
+ 
+ #### ConcurrentHashMap基本用法
+ 
+ ##### JDK1.7种ConcurrentHashMap的实现
+    
+    初始化，初始化之后segments不再变化，变化的只是其下table的容量和每个节点下的链表长度
+    get
+    put
+    rehash
+    remove
+    size    尽量不要用size来统计是否有数据，会造成重量级别的锁住整个map来统计，用isEmpty
+    isEmpty
+    containsValue   尽量不要使用，同size一样，会锁住整个map
+    
+    弱一致，所以get和containsKey可能会得到不一致的内容
+ 
+ ##### JDK1.8中ConcurrentHashMap的实现
+ 
+    取消了1.7中的segment，直接把table提到segment的高度，锁的是table，用红黑树取代了table下的链表结构
+    核心数据结构和属性
+        sizeCtrl
+    核心方法
+        tabAt
+        casTabAt
+        setTabAt
+    构造方法
+    初始化
+    get
+    put
+    remove
+    transfer
+    treeifyBeen
+    size
+    
+    红黑树和链表的转换：table长度大于8的时候会转换成红黑树，红黑树小于6时转换成链表
+ 
+ #### 并发下的Map常见面试题汇总
+ 
+ - HashMap和HashTable有什么区别？
+ 
+ - Java中的另一个线程安全的与HashMap极其类似的类是什么？同样是线程安全，它与HashTable在线程同步上有什么不同？
+ 
+    HashTable锁住的是整个table，ConcurrentHash采用的是分段锁(1.7)和CAS(1.8)结合
+    
+ - HashMap & ConcurrentHashMap的区别？
+ 
+    HashMap线程不安全，ConcurrentHashMap线程安全
+    HashMap允许键值对为null，ConcurrentHashMap不允许
+ 
+ - 为什么ConcurrentHashMap比HashTable效率高？
+ 
+    锁住了整个表，容易造成阻塞，ConcurrentHashMap采用分段锁，锁的粒度小
+    
+- ConcurrentHashMap锁机制具体分析(JDK1.7 VS JDK1.8)?
+
+- ConcurrentHashMap在JDK1.8种，为什么要使用内置锁 synchronized 来代替重入锁ReentrantLock？
+
+    1.8中synchronized已经做了很大的优化，ReentrantLock需要消耗资源
+
+- 1.8下ConcurrentHashMap简单介绍
+
+    数据结构，常用的put、get方法是怎么实现的
+    sizeCtl来控制初始化和扩容的大小，以及标记当前是否正在扩容或正在初始化
+    Node节点 -> 
+        TreeNode
+        TreeBin
+    get：如果是table节点，直接返回，否则按照链表或红黑树查找
+    put：table为空，直接放在table节点，否则table加锁按照链表或红黑树方式插入，链表数大于8则转换成红黑树，最后检测是否需要扩容
+        扩容：工作线程会协助进行扩容，为了避免扩容冲突，每个线程会按照一定的步长进行选择table节点进行辅助扩容
+
+- ConcurrentHashMap的并发度是什么？
+
+    默认16
+ 
+ #### Concurrent其他系列容器
