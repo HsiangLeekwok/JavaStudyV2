@@ -2,6 +2,8 @@ package com.enjoy.study.ch005;
 
 import org.junit.Test;
 
+import java.util.concurrent.BlockingDeque;
+
 /**
  * <b>Author</b>: Hsiang Leekwok<br/>
  * <b>Date</b>: 2019/05/07 19:18<br/>

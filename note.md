@@ -189,6 +189,7 @@ syn(对象){
     
     什么是原子操作？如何实现原子操作？
     属于乐观锁
+    JDK CAS 机制 ---> 无锁化编程
     
 CAS的原理
 
@@ -399,3 +400,71 @@ CAS的问题
     默认16
  
  #### Concurrent其他系列容器
+ 
+    ConcurrentSkipListMap 和 ConcurrentSkipListSet，需要了解什么是SkipList?
+    跳表
+        Redis、Lucence都使用了跳表来进行快速查找
+    TreeMap 和 TreeSet：TreeSet是对TreeMap的包装
+    
+    ConcurrentLinkedQueue，LinkedList的并发版本，无界非阻塞队列
+        add：在队尾加入一个元素
+        offer
+        peek
+        poll：拿到并移除头元素
+    
+    写时复制容器：写的时候直接复制一个新容器，并把旧容器里的内容重指向新容器
+        - CopyOnWriteArrayList
+        - CopyOnWriteArraySet
+        使用于绝大多数读，极少写的场景：
+            白名单、黑名单等
+        缺点：数据一致性、空间换时间
+        
+#### 阻塞队列 BlockingQueue
+        
+    什么是阻塞队列：阻塞的元素变动方法，生产者消费者模式下用得多
+        阻塞的插入：队列满，插入会阻塞
+        阻塞的移除：队列空，移除会阻塞
+    常用方法
+    常用阻塞队列：
+        ArrayBlokinQueue：一个由数组结构组成的有界阻塞队列
+        LinkedBlockingQueue：一个由链表结构组成的有界阻塞队列
+        PriorityBlockingQueue：一个支持优先级排序的无界阻塞队列
+        DelayQueue：一个使用优先级队列实现的无界阻塞队列，平时用得最多，提供延时获取元素方式（时间到期后才能拿得到数据）
+        SynchronousQueue：异步不存储元素的阻塞队列
+        LinkedTransferQueue：一个由链表结构组成的无界阻塞队列
+        LinkedBlockingDeque：一个由链表结构组成的**双向**阻塞队列
+            头尾都可以拿和取
+            Fork/Join里的工作密取用到了这个队列
+            
+    阻塞队列的实现原理：作业
+    
+### 第六课：线程池
+
+#### 什么事线程池？为什么要用线程池？
+
+    好处：
+        1、降低资源的消耗 Thread
+        2、提高相应速度 T1：创建时间、T2：运行时间、T3：销毁时间，线程池大部分时间只需要T2即可
+        3、提高线程的可管理性
+
+#### 造轮子，先实现一个我们自己的线程池
+
+    1、缺省的线程数量
+
+#### 再来看看JDK中的线程池和工作原理
+
+    JDK中的线程池和工作机制
+        线程池创建时各个参数的含义，面试必问
+        提交任务
+        关闭线程池
+
+    Executor框架
+        Executor
+            ExecutorService
+                AbstractExecutorService
+                    ThreadPoolExecutor
+                        ScheduledThreadPoolExecutor
+                        
+    合理配置线程池
+
+#### 如何使用好
