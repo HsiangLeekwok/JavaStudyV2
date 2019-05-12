@@ -402,7 +402,7 @@ CAS的问题
  #### Concurrent其他系列容器
  
     ConcurrentSkipListMap 和 ConcurrentSkipListSet，需要了解什么是SkipList?
-    跳表
+    跳表(概率数据结构)
         Redis、Lucence都使用了跳表来进行快速查找
     TreeMap 和 TreeSet：TreeSet是对TreeMap的包装
     
@@ -417,7 +417,10 @@ CAS的问题
         - CopyOnWriteArraySet
         使用于绝大多数读，极少写的场景：
             白名单、黑名单等
-        缺点：数据一致性、空间换时间
+        缺点：数据一致性(只能保证最终一致性)、空间换时间（内存开销大，2份）
+        避免：
+            创建时一次性固定大小；
+            批量提交修改
         
 #### 阻塞队列 BlockingQueue
         
@@ -455,9 +458,22 @@ CAS的问题
 
     JDK中的线程池和工作机制
         线程池创建时各个参数的含义，面试必问
+            corePerSize：核心线程数量
+                提交任务时，线程数量小于此值，则创建新线程
+            maxSize: 最大线程数量
+                如果queue队列已满，则继续创建线程，直到数量达到max
+            queue：任务队列
+                如果线程数量超过corePerSize，则新提交进来的任务放进队列里等待被处理
+            factory：线程创建工厂
+            policy：满任务时处理策略
+                如果线程数量超过max，则执行满任务处理策略（共4种），默认抛出异常（其余三种：直接丢弃，提交任务的线程来执行，
         提交任务
+            exuecute：提交任务，不需要得到任务的返回结果
+            submit：提交任务，返回一个Future<V>，可以用其拿取计算结果
         关闭线程池
-
+            shutdown：只终止空闲的线程
+            shutdownNow：不管线程是否空闲，都会调用interrupte方法
+        
     Executor框架
         Executor
             ExecutorService
@@ -466,5 +482,23 @@ CAS的问题
                         ScheduledThreadPoolExecutor
                         
     合理配置线程池
+        通过任务特性来合理配置
+            CPU密集型：线程数不要超过CPU数量+1（Runtime.getRuntime().getAvaliableProeces()）
+            IO密集型：磁盘、网络
+            混合型：CPU + IO 都有，尽量拆分成两个线程池，分开CPU密集和IO密集（如果两者相差悬殊，则没必要拆分）
 
 #### 如何使用好
+
+#### JDK与兴义的线程池详解
+
+    FixedThreadPool：固定线程池，其中任务队列太大Integer.MaxValue
+    SingleThreadExecutor
+    CachedThreadPool
+    WorkStealingPool
+    ScheculedThreadPoolExecutor：重点
+        需要catch业务代码，pool本身不会抛出异常且会吞掉业务代码中的异常
+        
+    CompletionService：
+        先完成的任务先获得结果
+
+### 第七课：并发安全

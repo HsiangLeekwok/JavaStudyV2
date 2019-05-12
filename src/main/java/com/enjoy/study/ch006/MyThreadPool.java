@@ -3,6 +3,8 @@ package com.enjoy.study.ch006;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * <b>Author</b>: Hsiang Leekwok<br/>
@@ -82,7 +84,6 @@ public class MyThreadPool {
                     if (null != r) {
                         System.out.println(getId() + " ready execute...." + ((WorkTask) r).getName());
                         r.run();
-                        r = null;
                     }
                 } catch (Exception ignore) {
 
@@ -97,6 +98,22 @@ public class MyThreadPool {
             interrupt();
         }
     }
+
+    /**
+     * 自定义的线程工厂
+     */
+    private class MyThreadFactory implements ThreadFactory {
+        private AtomicInteger atomicInteger = new AtomicInteger();
+
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread t = new Thread("myThreadPool" + atomicInteger.getAndIncrement());
+            // 线程池内的所有线程都设置为守护线程
+            t.setDaemon(true);
+            return t;
+        }
+    }
+
 
     private class WorkTask implements Runnable {
 
