@@ -15,19 +15,19 @@ import java.io.PrintWriter;
  * <b>Description</b>:
  */
 
-@TestController
-public class TestController {
-
-    @TestAutowired
-    private TestService testService;
-
-    public void query(HttpServletRequest request, HttpServletResponse response,
-                      @TestRequestParam("name") String name,
-                      @TestRequestParam("age") String age) {
-        try {
-            PrintWriter pw=response.getWriter();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-}
+//@TestController
+//public class TestController {
+//
+//    @TestAutowired
+//    private TestService testService;
+//
+//    public void query(HttpServletRequest request, HttpServletResponse response,
+//                      @TestRequestParam("name") String name,
+//                      @TestRequestParam("age") String age) {
+//        try {
+//            PrintWriter pw=response.getWriter();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//}
