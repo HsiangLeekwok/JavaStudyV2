@@ -56,7 +56,7 @@ public class HomeWork20190509_BlockingQueue<E> implements BlockingQueue<E> {
     }
 
     /**
-     * 指定阻塞队列容器的大小，超过这个大小时再添加元素会阻塞，这里去掉了带参数的方法，@Test 只允许无参构造方法
+     * 指定阻塞队列容器的大小，超过这个大小时再添加元素会阻塞，这里去掉了带参数的方法，@AppTest 只允许无参构造方法
      */
 //    public HomeWork20190509_BlockingQueue(int capacity) {
 //        if (capacity <= 0 || capacity >= DEFAULT_MAX) {
