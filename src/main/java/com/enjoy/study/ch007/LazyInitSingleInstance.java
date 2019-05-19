@@ -5,7 +5,7 @@ package com.enjoy.study.ch007;
  * <b>Date</b>: 2019/05/16 20:25<br/>
  * <b>Version</b>: v1.0<br/>
  * <b>Subject</b>: <br/> 懒汉式-双重检查
- * <b>Description</b>:延迟初始化占位类模式
+ * <b>Description</b>: 延迟初始化占位类模式
  */
 public class LazyInitSingleInstance {
 

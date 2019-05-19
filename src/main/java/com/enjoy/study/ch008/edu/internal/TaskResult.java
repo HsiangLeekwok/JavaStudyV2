@@ -38,4 +38,13 @@ public class TaskResult<Result> {
     public String getReason() {
         return reason;
     }
+
+    @Override
+    public String toString() {
+        return "TaskResult{" +
+                "resultType=" + resultType +
+                ", returnValue=" + returnValue +
+                ", reason='" + reason + '\'' +
+                '}';
+    }
 }

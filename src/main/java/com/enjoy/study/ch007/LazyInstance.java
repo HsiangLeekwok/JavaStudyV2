@@ -10,10 +10,23 @@ package com.enjoy.study.ch007;
 public class LazyInstance {
 
     private Integer value;
-    private Integer heavy;// 成员变量，很耗资源
+    private static Integer heavy;// 成员变量，很耗资源
 
     public LazyInstance(Integer value) {
         super();
-        this.value=value;
+        this.value = value;
+    }
+
+    private static class InstanceHolder {
+        // 域延迟加载
+        static Integer val = 100;
+    }
+
+    public Integer getValue() {
+        return value;
+    }
+
+    public Integer getHeavy() {
+        return InstanceHolder.val;
     }
 }

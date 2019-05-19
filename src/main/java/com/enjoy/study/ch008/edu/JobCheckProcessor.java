@@ -19,7 +19,7 @@ public class JobCheckProcessor {
 
     // 单例化
     private static class ProcessorHolder {
-        public static JobCheckProcessor instance = new JobCheckProcessor();
+        static JobCheckProcessor instance = new JobCheckProcessor();
     }
 
     public static JobCheckProcessor getInstance() {
@@ -42,12 +42,18 @@ public class JobCheckProcessor {
                     jobInfoMap.remove(jobName);
                     System.out.println(jobName + " is timeout.");
                 } catch (Exception ignore) {
-
+                    ignore.printStackTrace();
                 }
             }
         }
     }
 
+    /**
+     * 任务处理完之后，加入定时缓存中，提供一段时间内的缓存查询，超时之后再清除
+     *
+     * @param jobName    工作名称
+     * @param expireTime 超时时间
+     */
     public void putJob(String jobName, long expireTime) {
         DelayItem<String> item = new DelayItem<>(expireTime, jobName);
         queue.offer(item);

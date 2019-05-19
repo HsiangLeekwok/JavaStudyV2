@@ -1,19 +1,4 @@
-package com.enjoy.openclass._201905141400.servlet;
-
-import com.enjoy.openclass._201905141400.annotation.TestAutowired;
-import com.enjoy.openclass._201905141400.annotation.TestController;
-import com.enjoy.openclass._201905141400.annotation.TestRequestMapping;
-import com.enjoy.openclass._201905141400.annotation.TestService;
-
-import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package com.enjoy.openclass._20190514.servlet;
 
 /**
  * <b>Author</b>: Hsiang Leekwok<br/>

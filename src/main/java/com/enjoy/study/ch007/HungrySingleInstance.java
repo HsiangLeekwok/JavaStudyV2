@@ -13,5 +13,8 @@ public class HungrySingleInstance {
 
     }
 
+    /**
+     * 饿汉式，申明变量的时候直接创建对象
+     */
     private static HungrySingleInstance instance = new HungrySingleInstance();
 }

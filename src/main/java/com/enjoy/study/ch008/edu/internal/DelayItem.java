@@ -17,6 +17,7 @@ public class DelayItem<Data> implements Delayed {
 
     public DelayItem(long expirationTime, Data data) {
         this.activeTime = expirationTime * 1000 + System.currentTimeMillis();
+        this.data = data;
     }
 
     public long getActiveTime() {

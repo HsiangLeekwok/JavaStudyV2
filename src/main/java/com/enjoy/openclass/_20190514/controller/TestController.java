@@ -1,11 +1,4 @@
-package com.enjoy.openclass._201905141400.controller;
-
-import com.enjoy.openclass._201905141400.annotation.TestAutowired;
-import com.enjoy.openclass._201905141400.annotation.TestRequestParam;
-import com.enjoy.openclass._201905141400.annotation.TestService;
-
-import java.io.IOException;
-import java.io.PrintWriter;
+package com.enjoy.openclass._20190514.controller;
 
 /**
  * <b>Author</b>: Hsiang Leekwok<br/>

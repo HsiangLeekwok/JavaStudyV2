@@ -1,4 +1,4 @@
-package com.enjoy.openclass._201905141400.annotation;
+package com.enjoy.openclass._20190514.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;

@@ -18,20 +18,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class JobInfo<Result> {
 
     /**
-     * 任务名称
+     * 工作名称
      */
     private final String jobName;
     // 任务长度
     private final int jobLength;
+    // 工作的业务处理器
     private final ITaskProcessor<?, ?> taskProcessor;
 
+    // 任务执行成功次数
     private AtomicInteger successCount;
+    // 任务已经处理的数量
     private AtomicInteger proceedCount;
 
     // 存放每个任务的处理结果
     private LinkedBlockingDeque<TaskResult<Result>> taskQueue;
+    // 任务超时时间
     private final long expireTime;
 
+    // 任务超时检测处理器
     private static JobCheckProcessor processor = JobCheckProcessor.getInstance();
 
     public JobInfo(String jobName, int jobLength, ITaskProcessor<?, ?> processor, long expireTime) {
@@ -56,11 +61,30 @@ public class JobInfo<Result> {
         return proceedCount.get();
     }
 
+    public int getFailureCount() {
+        return proceedCount.get() - successCount.get();
+    }
+
     public int getJobLength() {
         return jobLength;
     }
 
+    /**
+     * 查询处理进度
+     *
+     * @return
+     */
+    public String getProgress() {
+        return "Success[" + successCount.get() + "], Current[" + proceedCount.get() + "], Total[" + jobLength + "]";
+    }
+
     // 提供工作中每个任务的处理结果
+
+    /**
+     * 查询每个任务的处理结果
+     *
+     * @return
+     */
     public List<TaskResult<Result>> getTaskDetail() {
         List<TaskResult<Result>> list = new ArrayList<>();
         TaskResult<Result> result;
@@ -74,12 +98,14 @@ public class JobInfo<Result> {
      * 任务执行结果放入队列；
      * 从业务应用角度来说，对查询任务进度数据的一致性要求不高，只需要保证最终一致性即可，无需对整个方法加锁
      *
-     * @param taskResult
+     * @param taskResult 任务执行完的结果
      */
     public void addTaskResult(TaskResult<Result> taskResult) {
         if (TaskResultType.Success.equals(taskResult.getResultType())) {
+            // 成功的任务数量加 1
             successCount.incrementAndGet();
         }
+        // 总的任务处理进度加 1
         proceedCount.incrementAndGet();
         taskQueue.addLast(taskResult);
         if (proceedCount.get() == jobLength) {

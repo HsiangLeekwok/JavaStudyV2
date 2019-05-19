@@ -11,5 +11,10 @@ import com.enjoy.study.ch008.edu.internal.TaskResult;
  */
 public interface ITaskProcessor<Data, Result> {
 
-    TaskResult<Result> execute(Data t);
+    /**
+     * 用户自定义的业务执行代码
+     * @param data
+     * @return
+     */
+    TaskResult<Result> execute(Data data);
 }
