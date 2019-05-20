@@ -33,6 +33,8 @@ public class RpcServiceV1_5 {
     // produce 60 documents(cpu x8) cost  72207ms: 1205ms(cache)
     // produce 60 documents(cpu x16) cost 45750ms: 762.5ms(cache)
     // produce 60 documents(cpu x16) cost 44990ms: 750ms(cache, upload x3)
+    // produce 6000 documents(cpu x16) cost 169241ms: 28.2ms(cache, upload x3)
+    // produce 60000 documents(cpu x16) cost 1472276ms: 24.53ms(cache, upload x3)
     /**
      * IO 密集型任务，线程数量可以定为 CPU 数量 x2
      */
@@ -97,7 +99,7 @@ public class RpcServiceV1_5 {
         QuestionBank.init();
         System.out.println("initialize question bank complete.");
 
-        int docSize = 60;
+        int docSize = 60000;
         List<Document> documents = MakePendingDocument.makeDocuments(docSize);
         long begin = System.currentTimeMillis();
 
