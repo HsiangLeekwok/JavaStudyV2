@@ -16,7 +16,7 @@ import java.util.concurrent.*;
  * <b>Subject</b>: 服务化，拆分业务逻辑为不同的子服务<br/>
  * <b>Description</b>: 1、拆分文档处理为单独的服务；2、拆分上传业务为单独的服务；3、将两者分别交给不同的线程池来执行
  */
-public class RpcServiceV1_5 {
+public class RpcServiceV2 {
 
     //                                       TOTAL      AVG
     // produce  3 documents(cpu x1) cost     165486ms:  55162ms(sequential)
@@ -38,11 +38,11 @@ public class RpcServiceV1_5 {
     /**
      * IO 密集型任务，线程数量可以定为 CPU 数量 x2
      */
-    private static ExecutorService makeService = Executors.newFixedThreadPool(Const.CPU * 16);
+    private static ExecutorService makeService = Executors.newFixedThreadPool(Const.CPU * 3);
     /**
      * 上传任务
      */
-    private static ExecutorService uploadService = Executors.newFixedThreadPool(Const.CPU * 16 * 3);
+    private static ExecutorService uploadService = Executors.newFixedThreadPool(Const.CPU * 3 * 5);
 
     /**
      * 文档解析
@@ -68,7 +68,7 @@ public class RpcServiceV1_5 {
         public String call() throws Exception {
             long start = System.currentTimeMillis();
             // 缓存已处理过的题目以加快速度
-            String docName = ProduceDocumentService.makeDocumentCached(document);
+            String docName = ProduceDocumentService.makeDocumentAsync(document);
             System.out.println("make document " + document.getDocName() + " cost: " + (System.currentTimeMillis() - start) + "ms");
             return docName;
         }
@@ -99,7 +99,7 @@ public class RpcServiceV1_5 {
         QuestionBank.init();
         System.out.println("initialize question bank complete.");
 
-        int docSize = 60000;
+        int docSize = 60;
         List<Document> documents = MakePendingDocument.makeDocuments(docSize);
         long begin = System.currentTimeMillis();
 

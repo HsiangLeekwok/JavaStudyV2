@@ -17,7 +17,7 @@ public class Const {
     /**
      * 模拟数据库中题目个数
      */
-    public static final int QUESTION_BANK_TOTAL = 5000;
+    public static final int QUESTION_BANK_TOTAL = 2000;
 
     /**
      * 每份文档中题目数量基数

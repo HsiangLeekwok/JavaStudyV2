@@ -3,11 +3,15 @@ package com.enjoy.study.ch008.doc.service;
 import com.enjoy.study.ch008.doc.entity.Document;
 import com.enjoy.study.ch008.doc.entity.QuestionInCache;
 import com.enjoy.study.ch008.doc.entity.QuestionInDB;
+import com.enjoy.study.ch008.doc.entity.TaskResult;
 import com.enjoy.study.ch008.doc.etc.QuestionBank;
 import com.enjoy.utils.ThreadTool;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 /**
  * <b>Author</b>: Hsiang Leekwok<br/>
@@ -28,35 +32,31 @@ public class ProduceDocumentService {
         StringBuilder sb = new StringBuilder();
         for (int i : document.getQuestions()) {
             // 模拟解析题目以及其内容
-            sb.append(QuestionService.analyseQuestion(i));
+            sb.append(SingleQuestionService.analyseQuestion(i));
         }
         return "complete_" + document.getDocName() + "_" + System.currentTimeMillis() + ".pdf";
     }
 
     /**
-     * 已处理过的题目缓存列表
-     */
-    private static ConcurrentHashMap<Integer, QuestionInCache> cachedQuestion = new ConcurrentHashMap<>();
-
-    /**
-     * 并行，异步化文档处理过程，缓存已处理过的文档已加快速度
+     * 缓存已处理过的文档以加快速度
      *
      * @param document 待处理的文档
-     * @return
+     * @return 返回文档处理完毕的本地文件名
      */
     public static String makeDocumentCached(Document document) {
         System.out.println("begin to make document: " + document.getDocName());
         StringBuilder sb = new StringBuilder();
         int hitSize = 0;
+        ConcurrentHashMap<Integer, QuestionInCache> cached = ConcurrentQuestionService.getCache();
         for (int i : document.getQuestions()) {
             // 检测缓存中是否已有处理过的记录
-            QuestionInCache inCache = cachedQuestion.get(i);
+            QuestionInCache inCache = cached.get(i);
             if (null == inCache) {
                 // 模拟解析题目以及其内容
                 QuestionInDB inDB = QuestionBank.getQuestion(i);
-                String detail = QuestionService.analyseQuestion(i);
+                String detail = SingleQuestionService.analyseQuestion(i);
                 sb.append(detail);
-                cachedQuestion.put(i, new QuestionInCache(detail, inDB.getSha()));
+                cached.put(i, new QuestionInCache(detail, inDB.getSha()));
             } else {
                 hitSize++;
                 sb.append(inCache.getDetail());
@@ -68,10 +68,36 @@ public class ProduceDocumentService {
     }
 
     /**
+     * 并行生成题目并且同时更新题目内容
+     *
+     * @param document 待处理的文档
+     * @return 返回文档处理完毕的本地文件名
+     */
+    public static String makeDocumentAsync(Document document) throws ExecutionException, InterruptedException {
+
+        System.out.println("begin to make document: " + document.getDocName());
+
+        Map<Integer, TaskResult> qstResultMap = new HashMap<>();
+        for (Integer questionId : document.getQuestions()) {
+            // 把题目按照顺序加入处理队列
+            qstResultMap.put(questionId, ConcurrentQuestionService.analyseQuestion(questionId));
+        }
+
+        StringBuilder sb = new StringBuilder();
+        // 按照顺序把题目组合成文档
+        for (Integer questionId : document.getQuestions()) {
+            TaskResult result = qstResultMap.get(questionId);
+            // 返回的已处理题目，要么是题目文本，要么是等待处理的future
+            sb.append(result.getDetail() == null ? result.getFuture().get().getDetail() : result.getDetail());
+        }
+        return "complete_" + document.getDocName() + "_" + System.currentTimeMillis() + ".pdf";
+    }
+
+    /**
      * 上传文档并返回上传之后的路径
      *
      * @param localPdfName 本地文档路径
-     * @return
+     * @return 返回上传之后文档的url
      */
     public static String uploadDocument(String localPdfName) {
         Random random = new Random();

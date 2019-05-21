@@ -10,7 +10,7 @@ import com.enjoy.study.ch008.doc.etc.QuestionBank;
  * <b>Subject</b>: 解析题目文本，下载图片等，返回解析后的文本<br/>
  * <b>Description</b>:
  */
-public class QuestionService {
+public class SingleQuestionService {
 
     /**
      * 解析题目

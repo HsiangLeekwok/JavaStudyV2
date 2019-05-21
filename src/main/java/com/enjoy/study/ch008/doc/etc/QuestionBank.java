@@ -77,6 +77,7 @@ public class QuestionBank {
             int id = random.nextInt(Const.QUESTION_BANK_TOTAL);
             String detail = randomDetail(randomDetailLength(random));
             questionMap.put(id, new QuestionInDB(id, detail, EncryptUtils.sha1(detail)));
+            //System.out.println("question " + id + " has updated.");
         }
     }
 
@@ -84,7 +85,7 @@ public class QuestionBank {
      * 启动定时更新题库
      */
     private static void scheduleUpdate() {
-        updateQuestionService.scheduleAtFixedRate(new UpdateQuestion(), 10, 8, TimeUnit.SECONDS);
+        updateQuestionService.scheduleAtFixedRate(new UpdateQuestion(), 1, 2, TimeUnit.SECONDS);
     }
 
 //    static {
