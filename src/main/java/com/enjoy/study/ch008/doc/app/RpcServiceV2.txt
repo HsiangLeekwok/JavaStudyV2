@@ -6102,4 +6102,6 @@ upload pdf to http://www.xxx.com/upload/complete_document_1996_1558414863363.pdf
 upload pdf to http://www.xxx.com/upload/complete_document_1994_1558414863588.pdf cost: 9328ms
 upload pdf to http://www.xxx.com/upload/complete_document_1999_1558414863854.pdf cost: 9136ms
 upload pdf to http://www.xxx.com/upload/complete_document_1997_1558414863706.pdf cost: 9473ms
-produce 2000 documents cost 176494ms
+make 2000 doc cost 176494ms
+CPU: Intel(R) Core(TM) i7 M 640 @ 2.80GHz
+Executor: core size cpu x3, upload: cpu x10
