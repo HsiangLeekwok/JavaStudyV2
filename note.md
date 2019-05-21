@@ -595,3 +595,113 @@ Spring的IOC初始化的时候是加了锁的，且用的是普通HashMap，初�
 ### 2、架构师技能 - 构建基础服务架构要从需求中抽取共性
 
 ### 3、分析需求，研究共性
+
+
+## 第九课 JMM(Java Memory Module)和底层实现原理
+
+### 1、JMM基础-计算机原理
+
+### 2、物理内存模型带来的问题
+
+    缓存一致性
+
+### 3、你所不知道的伪共享
+
+    CPU存数据的时候以缓存行来存放
+    1行 = 64Byte，可以存储多个变量，多个线程访问同一行内的变量时，会有竞争问题导致性能问题
+    
+    通过数据填充来避免伪共享
+    
+    @sun.misc.Contended(ConcurrentHashMap里有)
+    // 自己添加这个注解不能用，需要在虚拟机启动参数里添加：
+    -XX:-RestrictContended
+    
+    distruptor 高速队列：100w级每秒的吞吐量
+    BlockingQueue
+
+### 4、Java内存模型和导致的问题
+
+    每个线程都有自己的工作内存，所有线程共享主内存
+        工作内存：抽象概念，一般包括主内存的一部分、缓存、寄存器
+        
+    JMM导致的并发安全问题
+        可见性问题
+            volatile关键字，加锁来解决
+    
+        竞争性问题
+            加锁
+            
+        重排序类型
+            源代码 - 编译器优化重排序 - 指令级并行重排序 - 内存系统重排序 - 最终执行指令序列
+        重排序与依赖性
+            数据依赖性
+                写后读：写一个变量之后，再读这个变量
+                写后写：写一个变量之后，再写这个变量
+                读后写：都一个变量之后，再写这个变量
+                
+                as-if-serial：仿佛是串行
+            控制依赖性：猜测，提前执行
+                多线程下可能会改变执行结果
+
+### 5、如何解决在并发下的问题
+
+    内存屏障：强制刷出cache
+        LoadLoad Barriers：确保前序装载指令完成，后续指令才继续执行
+        StoreStore Barriers：确保前序写入指令对其他处理器可见（刷新到内存）
+        LoadStore Barriers：
+        StoreLoad Barriers：同时具有以上3个屏障的功能
+        
+    临界区：也即锁（及其代码块）
+        临界区内的代码可以重排，临界区内的变量不能逃逸出临界区
+
+### 6、必须了解的Happens-Before
+
+    定义：用happens-before的概念来阐述操作之间的内存可见性。在JMM中，如果一个操作执行的结果需要对另一个操作可见，那么这两个操作之间必须要存在happens-before关系
+    两个操作之间具有happens-before关系，并不意味着前一个操作不需要在后一个操作之前执行，happens-before仅仅要求前一个操作（执行结果）对后一个操作可见，且前一个操作按顺序排在第二个操作之前
+    (the first is visible to and ordered before the second)
+    
+    加深理解：
+        1、如果一个操作happens-before另一个操作，那么第一个操作的执行结果将对第二个操作可见，而且第一个操作的执行顺序排在第二个操作之前（对程序员来说）
+        2、两个操作之间存在happens-before关系，并不意味着Java平台的具体实现必须要按照happens-before关系指定的顺序来执行。如果重排序之后的执行结果与按happens-before关系来执行的结果一致，那么这种重排序是允许的（对编译器和处理器来说）
+    
+    happens-before规则
+        1、程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作
+        2、监视器锁规则：对一个锁的解锁，happens-before于随后对这个锁的加锁
+        3、volatile变量规则
+        4、传递性
+        5、start()规则
+        6、join()规则；如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before与线程A从ThreadB.join()操作成功返回
+        7、线程中断规则
+        
+    面试大厂会问到
+
+### 7、volatile的详解
+
+    可以把对volatile变量的单个读写，看成是使用同一个锁对这些单个读写操作做了同步
+    
+    volatile变量自身具有下列属性：
+        可见性，对一个volatile变量的读，总是能看到（任意县城）对这个volatile变量最后的写入
+        原子性，对任意单个volatile变量的读写具有原子性，但类似于volatile++这种符合操作不具有原子性
+
+    volatile的内存语义：
+        volatile写的内存语义，当写一个volatile变量时，JMM会把该线程对应的本地内存中的所有共享变量值刷新到主内存。
+        volatile读的内存语义：当读一个volatile变量时，JMM会把该线程对应的本地内存置为无效。线程接下来将从主内存中读取共享变量。
+        
+    volatile只能保证可见性，不能保证原子性
+    
+    volatile内存语义的实现，volatile重排序规则表
+        JMM对volatile的内存屏障插入策略，（写前后个插入一个屏障，读后面连续插入2个屏障（防止下面的读、写操作与volatile读进行重排序））
+            - 在每个volatile写操作的前面插入一个StoreStore屏障，在每个volatile写操作的后面插入一个StoreLoad屏障
+            - 在每个volatile读操作的后面插入一个LoadLoad屏障。在每个volatile都操作的后面插入一个loadstore屏障
+            
+    volatile的实现原理
+        有volatile变量修饰的共享变量进行写操作的时候会使用CPU提供的lock前缀指令
+            - 将当前处理器缓存行的数据协会到系统内存
+            - 这个写回内存的操作会使在其他CPU里缓存了该内存地址的数据无效
+        面试可能会问到
+
+### 8、final和锁的内存语义
+
+### 9、synchronized的实现原理
+
+### 10、了解各种锁

@@ -38,11 +38,11 @@ public class RpcServiceV2 {
     /**
      * IO 密集型任务，线程数量可以定为 CPU 数量 x2
      */
-    private static ExecutorService makeService = Executors.newFixedThreadPool(Const.CPU * 3);
+    private static ExecutorService makeService = Executors.newFixedThreadPool(Const.CPU * 4);
     /**
      * 上传任务
      */
-    private static ExecutorService uploadService = Executors.newFixedThreadPool(Const.CPU * 3 * 10);
+    private static ExecutorService uploadService = Executors.newFixedThreadPool(Const.CPU * 4 * 10);
 
     /**
      * 文档解析
