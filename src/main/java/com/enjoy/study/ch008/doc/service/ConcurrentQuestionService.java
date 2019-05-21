@@ -41,14 +41,14 @@ public class ConcurrentQuestionService {
     public static TaskResult analyseQuestion(int questionId) {
         QuestionInCache cache = cachedQuestion.get(questionId);
         if (null == cache) {
-            System.out.println("Question " + questionId + " not cached, refresh it.");
+            //System.out.println("Question " + questionId + " not cached, refresh it.");
             return new TaskResult(getQuestionFuture(questionId));
         } else {
             // 缓存中存在，则查询摘要是否已变化
             String sha = QuestionBank.getQuestion(questionId).getSha();
             if (cache.getSha().equals(sha)) {
                 // 摘要没有变化
-                System.out.println("Question " + questionId + " has cached, reuse it.");
+                //System.out.println("Question " + questionId + " has cached, reuse it.");
                 return new TaskResult(cache.getDetail());
             } else {
                 System.out.println("Question " + questionId + " has cached, but need update detail.");
@@ -72,10 +72,10 @@ public class ConcurrentQuestionService {
                     cached = future;
                     analyseService.execute(future);
                 } else {
-                    System.out.println("Question " + questionId + " has other task processing");
+                    //System.out.println("Question " + questionId + " has other task processing");
                 }
             } else {
-                System.out.println("Question " + questionId + " in processing, not need re-create task.");
+                //System.out.println("Question " + questionId + " in processing, not need re-create task.");
             }
             return cached;
         } catch (Exception e) {

@@ -42,7 +42,7 @@ public class RpcServiceV2 {
     /**
      * 上传任务
      */
-    private static ExecutorService uploadService = Executors.newFixedThreadPool(Const.CPU * 3 * 5);
+    private static ExecutorService uploadService = Executors.newFixedThreadPool(Const.CPU * 3 * 10);
 
     /**
      * 文档解析
@@ -99,7 +99,7 @@ public class RpcServiceV2 {
         QuestionBank.init();
         System.out.println("initialize question bank complete.");
 
-        int docSize = 60;
+        int docSize = 2000;
         List<Document> documents = MakePendingDocument.makeDocuments(docSize);
         long begin = System.currentTimeMillis();
 
