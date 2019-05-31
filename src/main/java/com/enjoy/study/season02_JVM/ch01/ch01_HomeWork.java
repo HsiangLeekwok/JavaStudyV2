@@ -1,4 +1,4 @@
-package com.enjoy.study.season02_JVM;
+package com.enjoy.study.season02_JVM.ch01;
 
 /**
  * <b>Author</b>: 小果<br/>
