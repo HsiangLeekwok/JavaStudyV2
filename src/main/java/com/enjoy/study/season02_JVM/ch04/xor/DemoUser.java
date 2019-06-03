@@ -8,7 +8,7 @@ package com.enjoy.study.season02_JVM.ch04.xor;
  * <b>Description</b>:
  */
 public class DemoUser {
-    private int id=123;
+    private int id=13;
     private String name="king";
 
     @Override

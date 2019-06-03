@@ -1,7 +1,6 @@
 package com.enjoy.study.season02_JVM.ch04.xor;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 /**
  * <b>Author</b>: Hsiang Leekwok<br/>
@@ -22,9 +21,7 @@ public class CustomClassLoader extends ClassLoader {
 
     @Override
     public String toString() {
-        return "CustomClassLoader{" +
-                "name='" + name + '\'' +
-                '}';
+        return "CustomClassLoader{" + "name='" + name + '\'' + '}';
     }
 
     /**
@@ -42,6 +39,7 @@ public class CustomClassLoader extends ClassLoader {
         try {
             String tempName = name.replaceAll("\\.", "\\\\");
             File file = new File(basePath + "\\" + tempName + ".class");
+            // 解密
             data = encrypt.decrypt(file);
             //FileInputStream fis = new FileInputStream(file);
             //data = new byte[(int) file.length()];
@@ -55,6 +53,6 @@ public class CustomClassLoader extends ClassLoader {
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         byte[] data = this.loadClassData(name);
-        return defineClass(null, data, 0, data.length);
+        return defineClass(name, data, 0, data.length);
     }
 }

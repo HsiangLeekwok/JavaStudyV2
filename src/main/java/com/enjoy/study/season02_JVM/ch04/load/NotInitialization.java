@@ -15,7 +15,7 @@ public class NotInitialization {
         // 1、通过子类直接引用父类的静态变量 ——> 只会触发父类的初始化，不会触发子类的初始化
 //        System.out.println(SubClass.value);
 
-        // 2、使用数组的方式，会不会打印初始化
+        // 2、使用数组的方式，会不会打印初始化过程？————不会，只是初始化了一个数组容器，并没有初始化具体对象
         //SuperClass[] sca = new SuperClass[10];
 
         // 3、打印父类的final常量，不会导致父类初始化 ——> 常量编译后直接在常量池，不会初始化类
@@ -24,18 +24,15 @@ public class NotInitialization {
         // 4、如果使用常量去引用另外一个变量 ——> 会触发类初始化，只有类初始化之后才能知道变量值是多少
 //        System.out.println(SuperClass.WHAT);
 
-        CountDownLatch latch=new CountDownLatch(5);
+        CountDownLatch latch = new CountDownLatch(5);
         for (int i = 0; i < 5; i++) {
-            Thread thread=new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        latch.await();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println(SubClass.value);
+            Thread thread = new Thread(() -> {
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                System.out.println(SubClass.value);
             });
             thread.start();
             latch.countDown();

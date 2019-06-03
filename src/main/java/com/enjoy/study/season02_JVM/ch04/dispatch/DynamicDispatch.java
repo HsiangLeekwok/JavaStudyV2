@@ -34,6 +34,6 @@ public class DynamicDispatch {
         h2.sayHello();
 
         h1 = new Woman();
-        h2.sayHello();
+        h1.sayHello();
     }
 }
