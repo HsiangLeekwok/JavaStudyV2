@@ -24,7 +24,7 @@ public class ActiveEnum {
                 case DIVIDE:
                     return x / y;
             }
-            //throw new NoSuchMethodException();
+            throw new NoSuchMethodException();
         }
     }
 
