@@ -23,8 +23,9 @@ public class ActiveEnum {
                     return x * y;
                 case DIVIDE:
                     return x / y;
+                default:
+                    return 0;
             }
-            throw new NoSuchMethodException();
         }
     }
 

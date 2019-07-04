@@ -3,7 +3,6 @@ package com.enjoy.study.season03_MySQL;
 import org.junit.Test;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,14 +20,16 @@ public class InsertDemo {
 
     private static String user = "root";
     private static String pass = "root1234%";
-    private static String URL = "jdbc:mysql://127.0.0.1:3306/demo";
+    private static String URL = "jdbc:mysql://192.168.22.130:3306/demo";
+    private static String PATH = "D:\\JavaStudy\\all.sql";
 
     @Test
     public void test1() throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader("D:\\sql.sql"));
+        BufferedReader br = new BufferedReader(new FileReader(PATH));
         Connection connection = DriverManager.getConnection(URL, user, pass);
 
         LocalDateTime now = LocalDateTime.now();
+        long start = System.currentTimeMillis();
         System.out.println(now);
         br.lines().forEach(sql -> {
             try {
@@ -44,17 +45,19 @@ public class InsertDemo {
 
         LocalDateTime now2 = LocalDateTime.now();
         System.out.println(now2);
+        System.out.println("Time used: " + (System.currentTimeMillis() - start));
     }
 
     private int i = 0;
 
     @Test
     public void test2() throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader("D:\\sql.sql"));
+        BufferedReader br = new BufferedReader(new FileReader(PATH));
         Connection connection = DriverManager.getConnection(URL, user, pass);
 
         LocalDateTime now = LocalDateTime.now();
         System.out.println(now);
+        long start = System.currentTimeMillis();
         // 设置不自动提交
         connection.setAutoCommit(false);
 
@@ -79,17 +82,19 @@ public class InsertDemo {
 
         LocalDateTime now2 = LocalDateTime.now();
         System.out.println(now2);
+        System.out.println("Time used: " + (System.currentTimeMillis() - start));
     }
 
     private String str = "INSERT INTO `product_info` VALUES ";
 
     @Test
     public void test3() throws Exception {
-        BufferedReader br = new BufferedReader(new FileReader("D:\\sql.sql"));
+        BufferedReader br = new BufferedReader(new FileReader(PATH));
         Connection connection = DriverManager.getConnection(URL, user, pass);
 
         LocalDateTime now = LocalDateTime.now();
         System.out.println(now);
+        long start = System.currentTimeMillis();
         // 不需要自动提交
         connection.setAutoCommit(false);
         br.lines().forEach(sql -> {
@@ -114,5 +119,6 @@ public class InsertDemo {
 
         LocalDateTime now2 = LocalDateTime.now();
         System.out.println(now2);
+        System.out.println("Time used: " + (System.currentTimeMillis() - start));
     }
 }
