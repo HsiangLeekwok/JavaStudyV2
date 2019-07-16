@@ -142,9 +142,10 @@ public class NioClientHandle implements Runnable {
         // 如果连接码上建立成功，则此方法返回true，否则返回false
         // 因此必须关注连接就绪事件，并通过finishConnect方法完成连接操作
         if (socketChannel.connect(new InetSocketAddress(host, port))) {
-
+            // 连接成功后注册读事件
+            socketChannel.register(selector, SelectionKey.OP_READ);
         } else {
-            // 连接没有马上成功，还处在3此握手阶段，则需要注册 connect 事件
+            // 连接没有马上成功，还处在3次握手阶段，则需要注册 connect 事件
             socketChannel.register(selector, SelectionKey.OP_CONNECT);
         }
     }

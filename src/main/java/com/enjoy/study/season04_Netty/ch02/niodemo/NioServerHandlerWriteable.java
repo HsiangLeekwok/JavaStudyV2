@@ -125,7 +125,6 @@ public class NioServerHandlerWriteable implements Runnable {
                 if (buffer.hasRemaining()) {
                     int count = channel.write(buffer);
                     System.out.println("write: " + count + " bytes, has remain? " + buffer.hasRemaining());
-                    //channel.write(buffer);
                 } else {
                     // 已经写完了，此时需要注销写事件
                     // 设置 key 只关注读事件
