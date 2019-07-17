@@ -1,4 +1,4 @@
-package com.enjoy.study.season04_Netty.ch03.echo;
+package com.enjoy.study.season04_Netty.ch03.linebase;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -13,7 +13,7 @@ import io.netty.util.CharsetUtil;
  * <b>Subject</b>: 客户端入站处理 handler 实现类<br/>
  * <b>Description</b>:
  */
-public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
+public class LineBaseClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     /**
      * 当客户端读到数据后就会执行
@@ -28,8 +28,12 @@ public class EchoClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        ByteBuf msg;
         for (int i = 0; i < 100; i++) {
-            ctx.writeAndFlush(Unpooled.copiedBuffer("Hello Netty " + i + "\r\n", CharsetUtil.UTF_8));
+            String request = "Hello Netty " + i + System.getProperty("line.separator");
+            msg = Unpooled.buffer(request.length());
+            msg.writeBytes(request.getBytes());
+            ctx.writeAndFlush(msg);
         }
     }
 

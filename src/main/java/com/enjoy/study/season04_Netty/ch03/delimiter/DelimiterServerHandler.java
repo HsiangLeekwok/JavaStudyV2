@@ -1,4 +1,4 @@
-package com.enjoy.study.season04_Netty.ch03.echo;
+package com.enjoy.study.season04_Netty.ch03.delimiter;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -19,10 +19,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 
 @ChannelHandler.Sharable
-public class EchoServerHandler extends ChannelInboundHandlerAdapter {
+public class DelimiterServerHandler extends ChannelInboundHandlerAdapter {
 
     private AtomicInteger readCount = new AtomicInteger(0);
     private AtomicInteger readCompleteCount = new AtomicInteger(0);
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("client [" + ctx.channel().remoteAddress() + "] connected....");
+    }
 
     /**
      * 读取到完整的数据时触发
@@ -30,19 +35,13 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         readCount.getAndIncrement();
-        System.out.println("channelRead times: " + readCount.get());
         ByteBuf buffer = (ByteBuf) msg;
         String request = buffer.toString(CharsetUtil.UTF_8);
-        System.out.println("Server accept: " + request);
-        String response = "Hello " + request + ", welcome to netty world.";
+        System.out.println("Server accept: " + request+", read times: "+readCount.get());
+        String response = "Hello " + request + ", welcome to netty world." +
+                DelimiterEchoServer.DELIMITER;
         ctx.writeAndFlush(Unpooled.copiedBuffer(response.getBytes()));
         ReferenceCountUtil.release(msg);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
-        ctx.close();
     }
 
     /**
@@ -55,4 +54,11 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
         // 强制把缓冲区的数据刷到对端
         //ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        ctx.close();
+    }
+
 }
