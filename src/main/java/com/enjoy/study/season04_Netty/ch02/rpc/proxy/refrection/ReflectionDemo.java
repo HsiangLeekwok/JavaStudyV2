@@ -24,7 +24,7 @@ public class ReflectionDemo {
             // 打印方法名
             System.out.println(method.getName());
             if (method.getName().equals("toString")) {
-                System.out.println("执行：" + method.invoke(servantClass.newInstance(), null));
+                System.out.println("执行：" + method.invoke(servantClass.newInstance(), args));
             }
         }
     }
