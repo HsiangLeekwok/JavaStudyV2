@@ -58,6 +58,12 @@
             <artifactId>tomcat-embed-jasper</artifactId>
             <version>8.5.43</version>
         </dependency>
+        <!--Zookeeper-->
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+            <version>3.4.11</version>
+        </dependency>
     </dependencies>
 
 
